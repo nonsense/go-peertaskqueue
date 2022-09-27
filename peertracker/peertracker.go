@@ -7,7 +7,11 @@ import (
 	pq "github.com/ipfs/go-ipfs-pq"
 	"github.com/ipfs/go-peertaskqueue/peertask"
 	peer "github.com/libp2p/go-libp2p-core/peer"
+
+	logging "github.com/ipfs/go-log/v2"
 )
+
+var log = logging.Logger("peertracker")
 
 var clockInstance = clock.New()
 
@@ -249,6 +253,8 @@ func (p *PeerTracker) PopTasks(targetMinWork int) ([]*peertask.Task, int) {
 	var out []*peertask.Task
 	work := 0
 	for p.taskQueue.Len() > 0 && p.freezeVal == 0 && work < targetMinWork {
+		log.Debugw("taskqueue.pop", "len", p.taskQueue.Len(), "targetMinWork", targetMinWork, "work", work, "len_out", len(out))
+
 		if p.maxActiveWorkPerPeer > 0 {
 			// Do not add work to a peer that is already maxed out
 			p.activelk.Lock()
